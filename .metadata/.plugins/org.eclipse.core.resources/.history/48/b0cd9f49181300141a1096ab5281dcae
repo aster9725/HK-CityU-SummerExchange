@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    
+     <Button
+        android:id="@+id/category_animal"
+        android:layout_width="102dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40dp"
+        android:text="Animal" />
+
+    <Button
+        android:id="@+id/category_country"
+        android:layout_width="102dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+         android:layout_marginTop="40dp"
+        android:text="Country" />
+    <Button
+        android:id="@+id/category_food"
+        android:layout_width="102dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+         android:layout_marginTop="40dp"
+        android:text="Food" />
+    <Button
+        android:id="@+id/category_sport"
+        android:layout_width="102dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+         android:layout_marginTop="40dp"
+        android:text="Sports" />
+     <Button
+        android:id="@+id/category_stuff"
+        android:layout_width="102dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+         android:layout_marginTop="40dp"
+        android:text="Stuff" />
+    
+    
+
+</LinearLayout>

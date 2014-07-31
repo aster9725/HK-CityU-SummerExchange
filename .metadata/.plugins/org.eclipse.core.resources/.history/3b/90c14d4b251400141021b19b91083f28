@@ -1,0 +1,517 @@
+package com.example.wordquiz;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.SoundPool;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class MainActivity extends Activity {
+
+	RankView rv;
+
+	ImageButton[] mBtnAns = new ImageButton[4];
+	TextView mTxtQue;
+	ProgressBar mTimeBar;
+	Typeface tf = null;
+	Typeface tf_result = null;
+	CountDownTimer cntTimer, RWTimer;
+	SoundPool mEffectSound;
+	MediaPlayer mBackMusic;
+	Button[] btn = new Button[5];
+	
+	String[][] prefKey_eng  = {{ "eng_animal_1", "eng_animal_2", "eng_animal_3", "eng_animal_4", "eng_animal_5" },
+			{ "eng_country_1", "eng_country_2", "eng_country_3", "eng_country_4", "eng_country_5" },
+			{ "eng_food_1", "eng_food_2", "eng_food_3", "eng_food_4", "eng_food_5" },
+			{ "eng_sport_1", "eng_sport_2", "eng_sport_3", "eng_sport_4", "eng_sport_5" },
+			{ "eng_stuff_1", "eng_stuff_2", "eng_stuff_3", "eng_stuff_4", "eng_stuff_5" }};
+	
+	String[][] prefKey_chi  = {{ "chi_animal_1", "chi_animal_2", "chi_animal_3", "chi_animal_4", "chi_animal_5" },
+			{ "chi_country_1", "chi_country_2", "chi_country_3", "chi_country_4", "chi_country_5" },
+			{ "chi_food_1", "chi_food_2", "chi_food_3", "chi_food_4", "chi_food_5" },
+			{ "chi_sport_1", "chi_sport_2", "chi_sport_3", "chi_sport_4", "chi_sport_5" },
+			{ "chi_stuff_1", "chi_stuff_2", "chi_stuff_3", "chi_stuff_4", "chi_stuff_5" }};
+	
+	String[][] prefKey_kor 	 = {{ "kor_animal_1", "kor_animal_2", "kor_animal_3", "kor_animal_4", "kor_animal_5" },
+			{ "kor_country_1", "kor_country_2", "kor_country_3", "kor_country_4", "kor_country_5" },
+			{ "kor_food_1", "kor_food_2", "kor_food_3", "kor_food_4", "kor_food_5" },
+			{ "kor_sport_1", "kor_sport_2", "kor_sport_3", "kor_sport_4", "kor_sport_5" },
+			{ "kor_stuff_1", "kor_stuff_2", "kor_stuff_3", "kor_stuff_4", "kor_stuff_5" }};
+	
+	static int[] prefVal = new int[5];
+
+	int numQusetion;
+	final static int STATERECORD = 4;
+	final static int STATEGAME = 3;
+	final static int STATECATE = 2;
+	final static int STATELANG = 1;
+	final static int STATESTART = 0;
+
+	final static int STARTKOR = R.string.kor_animal_bear;
+	final static int STARTENG = R.string.eng_animal_bear;
+	final static int STARTCHI = R.string.chi_animal_bear;
+	final static int FOOD = 60;
+	final static int SPORT = 90;
+	final static int COUNTRY = 30;
+	final static int ANIMAL = 0;
+	final static int STUFF = 120;
+	final static int CLOCK = 0;
+	final static int RIGHT = 1;
+	final static int WRONG = 2;
+	final static int CLICK = 3;
+
+	private static int lang = STARTENG;
+	private static int catelang;
+	private static int category = ANIMAL;
+	private static int[] aryques = new int[30];
+	private static int curquestion = 0;
+	private static int anspos = 0;
+	private static int state = STATESTART;
+	private static int pre_state = STATESTART;
+	private static int right = 0;
+	private static int sound[] = new int[4];
+	private static int timeleft = 0;
+
+	OnClickListener CategoryChoiceListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			mEffectSound.play(sound[CLICK], 0.8f, 0.8f, 2, 0, 0);
+			switch (v.getId()) {
+			case R.id.category_animal:
+				category = ANIMAL;
+				break;
+
+			case R.id.category_country:
+				category = COUNTRY;
+				break;
+
+			case R.id.category_food:
+				category = FOOD;
+				break;
+
+			case R.id.category_sport:
+				category = SPORT;
+				break;
+
+			case R.id.category_stuff:
+				category = STUFF;
+				break;
+			}
+			changeState(STATEGAME);
+			showGameView();
+
+		}
+	};
+
+	OnClickListener LangChoiceListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub\
+			mEffectSound.play(sound[CLICK], 0.8f, 0.8f, 2, 0, 0);
+			catelang = 0;
+			switch (v.getId()) {
+
+			case R.id.lang_english:
+				lang = STARTENG;
+				catelang = R.string.cate_eng_animal;
+				break;
+
+			case R.id.lang_chinese:
+				lang = STARTCHI;
+				catelang = R.string.cate_chi_animal;
+				break;
+
+			case R.id.lang_korean:
+				lang = STARTKOR;
+				catelang = R.string.cate_kor_animal;
+				break;
+			}
+			changeState(STATECATE);
+			showCategoryView(catelang);
+			return;
+		}
+	};
+
+	OnClickListener startListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			mEffectSound.play(sound[CLICK], 0.8f, 0.8f, 2, 0, 0);
+			switch (v.getId()) {
+			case R.id.main_start:
+				changeState(STATELANG);
+				showLanguageView();
+				return;
+			case R.id.main_rank:
+				changeState(STATERECORD);
+				setContentView(rv);
+				return;
+			case R.id.main_exit:
+				finish();
+				return;
+			}
+		}
+	};
+
+	OnClickListener gameListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			if (v.getId() - anspos == mBtnAns[0].getId())
+				effectRight();
+			else
+				effectWrong();
+
+			playgame();
+		}
+	};
+
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		switch (state) {
+		case STATECATE:
+			changeState(STATELANG);
+			showLanguageView();
+			break;
+		case STATEGAME:
+			changeState(STATECATE);
+			cntTimer.cancel();
+			showCategoryView(catelang);
+			break;
+		case STATELANG:
+			changeState(STATESTART);
+			showStartView();
+			break;
+		case STATESTART:
+			finish();
+			break;
+		case STATERECORD:
+			changeState(pre_state);
+			if (state == STATESTART)
+				showStartView();
+			else
+				showResultView();
+			break;
+		}
+		// super.onBackPressed();
+	}
+
+	private void OX(boolean ox) {
+		if (ox)
+			mTxtQue.setBackgroundResource(R.drawable.res_right);
+		else
+			mTxtQue.setBackgroundResource(R.drawable.res_wrong);
+
+		RWTimer.start();
+	}
+
+	private void effectRight() {
+		right++;
+		mEffectSound.play(sound[RIGHT], 0.8f, 0.8f, 1, 0, 0);
+		OX(true);
+	}
+
+	private void effectWrong() {
+		mEffectSound.play(sound[WRONG], 0.8f, 0.8f, 1, 0, 0);
+		OX(false);
+	}
+
+	private void endGame() {
+		savePreferences(right);
+		cntTimer.cancel();
+		showResultView();
+	}
+
+	private void showCategoryView(int catelang) {
+		setContentView(R.layout.activity_category);
+		for (int i = 0; i < 5; i++) {
+			btn[i] = (Button) findViewById(R.id.category_animal + i);
+			btn[i].setOnClickListener(CategoryChoiceListener);
+			btn[i].setText(catelang + i);
+			btn[i].setTypeface(tf);
+		}
+	}
+
+	private void showLanguageView() {
+		setContentView(R.layout.activity_language);
+		for (int i = 0; i < 3; i++) {
+			btn[i] = (Button) findViewById(R.id.lang_chinese + i);
+			btn[i].setOnClickListener(LangChoiceListener);
+			btn[i].setTypeface(tf);
+		}
+	}
+
+	private void showStartView() {
+		setContentView(R.layout.activity_main);
+
+		if (tf == null)
+			tf = Typeface.createFromAsset(MainActivity.this.getAssets(),
+					"fonts/crayon.ttf");
+
+		for (int i = 0; i < 3; i++) {
+			btn[i] = (Button) findViewById(R.id.main_start + i);
+			btn[i].setOnClickListener(startListener);
+			btn[i].setTypeface(tf);
+		}
+	}
+
+	private void showGameView() {
+		setContentView(R.layout.activity_game);
+		setTimer();
+		curquestion = 0;
+		right = 0;
+		timeleft = 0;
+		mTxtQue = (TextView) findViewById(R.id.qusetion);
+		mTxtQue.setTypeface(tf);
+
+		for (int i = 0; i < 4; i++) {
+			mBtnAns[i] = (ImageButton) findViewById(R.id.btnans1 + i);
+			mBtnAns[i].setOnClickListener(gameListener);
+		}
+
+		for (int i = 0; i < 30; i++) {
+			aryques[i] = (int) (Math.random() * 100) % 30;
+			for (int j = i - 1; j >= 0; j--) {
+				if (aryques[i] == aryques[j]) {
+					i--;
+					break;
+				}
+			}
+		}
+		playgame();
+	}
+
+	private void showResultView() {
+		setContentView(R.layout.activity_result);
+		NumberFormat formatter = new DecimalFormat("0.#");
+		String score = formatter.format(right * 100 / 30);
+
+		mTxtQue = (TextView) findViewById(R.id.score);
+		mTxtQue.setTypeface(tf_result);
+		mTxtQue.setText(score);
+		mTxtQue.setTextColor(Color.BLACK);
+
+		for (int i = 0; i < 2; i++) {
+			btn[i] = (Button) findViewById(R.id.result_exit + i);
+			btn[i].setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					mEffectSound.play(sound[CLICK], 0.8f, 0.8f, 2, 0, 0);
+					switch (v.getId()) {
+					case R.id.result_exit:
+						state = STATESTART;
+						showStartView();
+						return;
+					case R.id.result_record:
+						state = STATERECORD;
+						setContentView(rv);
+						return;
+					}
+				}
+			});
+			btn[i].setTypeface(tf);
+		}
+	}
+
+	private void playgame() {
+
+		if (curquestion == 30)
+			endGame();
+		else {
+			int tmpoffset = (int) ((Math.random() * 100) % 30);
+			int offsets[] = new int[4];
+			anspos = (int) ((Math.random() * 100) % 4);
+
+			for (int i = 0; i < 4; i++)
+				offsets[i] = 0;
+
+			mTxtQue.setText(lang + category + aryques[curquestion]);
+			mBtnAns[anspos].setBackgroundResource(R.drawable.img_animal_bear
+					+ category + aryques[curquestion]);
+
+			offsets[anspos] = aryques[curquestion];
+
+			curquestion++;
+
+			for (int i = 0; i < 4; i++) {
+				if (i == anspos)
+					continue;
+				for (int j = 0; j < i; j++) {
+					if (tmpoffset == offsets[j]) {
+						j = 0;
+						tmpoffset = (int) (Math.random() * 100) % 30;
+					}
+
+				}
+
+				mBtnAns[i].setBackgroundResource(R.drawable.img_animal_bear
+						+ category + tmpoffset);
+				tmpoffset = (int) ((Math.random() * 100) % 30);
+			}
+		}
+
+	}
+
+	private void setTimer() {
+		mTimeBar = (ProgressBar) findViewById(R.id.timerbar);
+		mTimeBar.setMax(6000);
+		timeleft = 0;
+		cntTimer = new CountDownTimer(60 * 1000, 100) {
+
+			@Override
+			public void onTick(long millisUntilFinished) {
+				// TODO Auto-generated method stub
+				timeleft++;
+				mTimeBar.incrementProgressBy(10);
+
+				if (timeleft == 54 * 10)
+					mEffectSound.play(sound[CLOCK], 0.8f, 0.8f, 1, 0, 1f);
+			}
+
+			@Override
+			public void onFinish() {
+				// TODO Auto-generated method stub
+				endGame();
+			}
+		}.start();
+
+		RWTimer = new CountDownTimer(800, 800) {
+
+			@Override
+			public void onTick(long millisUntilFinished) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onFinish() {
+				// TODO Auto-generated method stub
+				mTxtQue.setBackgroundColor(0x00ffffff);
+			}
+		};
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		tf_result = Typeface.createFromAsset(MainActivity.this.getAssets(),
+				"fonts/BlackBoard.ttf");
+
+		mEffectSound = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+		sound[CLOCK] = mEffectSound.load(MainActivity.this, R.raw.clock, 1);
+		sound[RIGHT] = mEffectSound.load(MainActivity.this, R.raw.right, 2);
+		sound[WRONG] = mEffectSound.load(MainActivity.this, R.raw.wrong, 2);
+		sound[CLICK] = mEffectSound.load(MainActivity.this, R.raw.btnclick, 2);
+		mBackMusic = MediaPlayer.create(MainActivity.this,
+				R.raw.cool_funny_bounce_music);
+		mBackMusic.setOnCompletionListener(new OnCompletionListener() {
+
+			@Override
+			public void onCompletion(MediaPlayer mp) {
+				// TODO Auto-generated method stub
+				mp.start();
+			}
+		});
+		mBackMusic.start();
+		loadPreferences();
+		rv = new RankView(this);
+		for(int i=0;i<5;i++)
+			Toast.makeText(MainActivity.this, ""+prefVal[i], Toast.LENGTH_SHORT).show();
+		showStartView();
+	}
+
+	private void savePreferences(int score) {
+		SharedPreferences pref = getSharedPreferences("Quiz", MODE_PRIVATE);
+		int i;
+		for (i = 0; i < 5; i++) {
+			if (prefVal[i] == 99) {
+				prefVal[i] = score;
+				break;
+			}
+		}
+
+		if (i == 5) {
+			for (i = 1; i < 5; i++) {
+				prefVal[i - 1] = prefVal[i];
+			}
+			prefVal[4] = score;
+		}
+
+		for (i = 0; i < 5; i++) {
+			switch(lang){
+			case STARTENG:
+				pref.edit().putInt(prefKey_eng[category/30][i], prefVal[i]).commit();
+				break;
+			case STARTCHI:
+				pref.edit().putInt(prefKey_chi[category/30][i], prefVal[i]).commit();
+				break;
+			case STARTKOR:
+				pref.edit().putInt(prefKey_kor[category/30][i], prefVal[i]).commit();
+				break;
+			}
+			
+		}
+
+	}
+
+	private void loadPreferences() {
+		SharedPreferences pref = getSharedPreferences("Quiz", MODE_PRIVATE);
+		for (int i = 0; i < 5; i++) {
+			switch(lang){
+			case STARTENG:
+				prefVal[i] = pref.getInt(prefKey_eng[category/30][i], 99);
+				break;
+			case STARTCHI:
+				prefVal[i] = pref.getInt(prefKey_chi[category/30][i], 99);
+				break;
+			case STARTKOR:
+				prefVal[i] = pref.getInt(prefKey_kor[category/30][i], 99);
+				break;
+			}
+		}
+	}
+
+	private void changeState(int s) {
+		pre_state = state;
+		state = s;
+	}
+
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		mBackMusic.stop();
+		super.onDestroy();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.activity_main, menu);
+		return true;
+	}
+
+}

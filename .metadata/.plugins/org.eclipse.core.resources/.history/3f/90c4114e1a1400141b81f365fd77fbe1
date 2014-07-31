@@ -1,0 +1,47 @@
+package com.example.wordquiz;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Point;
+import android.view.Display;
+import android.view.View;
+
+public class RankView extends View {
+
+	int w;
+	int h;
+	Paint paint;
+	
+	public RankView(Context context) {
+		super(context);
+		// TODO Auto-generated constructor stub
+		setBackgroundResource(R.drawable.res_recordback);
+		paint = new Paint();
+		paint.setColor(Color.BLACK);
+		paint.setStrokeWidth(2);
+		paint.setTypeface(MainActivity.tf);
+	}
+
+	@Override
+	protected void onDraw(Canvas canvas) {
+		// TODO Auto-generated method stub
+		
+		canvas.drawLine(w/6, h/3, 5*w/6, h/3, paint);
+		canvas.drawLine(w/6, h/2, 5*w/6, h/2, paint);
+		canvas.drawLine(w/6, 2*h/3, 5*w/6, 2*h/3, paint);
+		canvas.drawText("past", w/6-50, 2*h/3+50, paint);
+		
+		
+		super.onDraw(canvas);
+	}
+	
+	@Override
+    public void onSizeChanged (int w, int h, int oldw, int oldh){
+        super.onSizeChanged(w, h, oldw, oldh);
+        this.w = w;
+        this.h = h;
+    }
+
+}

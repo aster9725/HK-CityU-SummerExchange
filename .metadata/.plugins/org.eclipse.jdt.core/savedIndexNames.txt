@@ -1,0 +1,9 @@
+INDEX VERSION 1.126+C:\Users\aster_000\Documents\GitHub\HK-CityU-SummerExchange\.metadata\.plugins\org.eclipse.jdt.core
+1387164166.index
+1598986216.index
+3238198760.index
+864176106.index
+1284074322.index
+3129714675.index
+1226900894.index
+347665150.index
