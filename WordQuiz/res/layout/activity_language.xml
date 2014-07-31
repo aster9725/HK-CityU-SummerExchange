@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/res_langback"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:layout_width="180sp"
+            android:layout_height="50sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/lang_chinese"
+            android:layout_width="180sp"
+            android:layout_height="50dp"
+            android:text="中文"
+            android:textSize="30dp"
+            android:background="@drawable/res_greenbtn" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/lang_english"
+            android:layout_width="180sp"
+            android:layout_height="50dp"
+            android:text="English"
+            android:textSize="30dp"
+            android:background="@drawable/res_greenbtn" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/lang_korean"
+            android:layout_width="180sp"
+            android:layout_height="50dp"
+            android:text="한국어"
+            android:textSize="30dp"
+            android:background="@drawable/res_greenbtn" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:layout_width="180sp"
+            android:layout_height="50sp" />
+    </LinearLayout>
+
+</LinearLayout>
